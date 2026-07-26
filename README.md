@@ -4,9 +4,6 @@ This repository contains the source code used to implement the PARC pipeline for
 physics-grounded adaptation of frozen urban thermal retrofit optimizers under
 natural-language constraints.
 
-This is a code-only, double-blind release. It intentionally contains no author
-names, affiliations, local machine paths, API credentials, raw geospatial data,
-trained weights, experiment outputs, or manuscript files.
 
 ## Components
 
@@ -97,11 +94,5 @@ AGENT_LLM_MODEL=...
 
 The `.env` file is ignored and must never be committed.
 
-## Anonymity and Repository Hygiene
 
-Before publishing, keep the generated Git history anonymous as well: do not copy
-the original repository's `.git` directory, and create the public anonymous
-repository from this release directory. The archive has been scanned for common
-secret patterns, personal absolute paths, author-identifying strings, compiled
-caches, datasets, weights, and result artifacts.
 
