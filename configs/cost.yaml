@@ -1,0 +1,14 @@
+actions:
+  add_tree:
+    cost: 8.0
+    cooling_prior_c: 1.8
+    shade_prior: 0.18
+  add_shade:
+    cost: 10.0
+    cooling_prior_c: 1.4
+    shade_prior: 0.22
+  cool_pavement:
+    cost: 5.0
+    cooling_prior_c: 0.7
+    shade_prior: 0.02
+

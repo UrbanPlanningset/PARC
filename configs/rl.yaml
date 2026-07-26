@@ -1,0 +1,16 @@
+rl:
+  algorithm: q_learning
+  episodes: 600
+  learning_rate: 0.12
+  discount: 0.92
+  epsilon_start: 0.8
+  epsilon_end: 0.05
+  random_seed: 7
+
+reward:
+  tmrt_weight: 1.0
+  shade_weight: 0.2
+  cost_weight: 0.08
+  invalid_penalty: 3.0
+  budget_penalty: 5.0
+

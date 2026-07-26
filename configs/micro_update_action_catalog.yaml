@@ -1,0 +1,319 @@
+version: 0.1
+purpose: >
+  Expanded urban micro-renewal action catalog for SOLWEIG-MLP-RL experiments.
+  Actions are grouped by how directly they can be represented in SOLWEIG inputs.
+
+support_levels:
+  direct_solweig:
+    description: Can be represented by modifying SOLWEIG spatial inputs or environmental parameters.
+  parameterized_proxy:
+    description: Can be approximated in SOLWEIG by changing land cover, SVF, vegetation DSM, albedo or emissivity.
+  external_or_future:
+    description: Relevant to urban micro-renewal but needs extra models or data beyond the current pipeline.
+
+action_groups:
+  trees_and_vegetation:
+    description: Tree and vegetation interventions with different geometry and radiative properties.
+    actions:
+      small_deciduous_tree:
+        support: direct_solweig
+        modifies: [landcover, cdsm_tree_canopy, tdsm_trunk_zone, svf, vegetation_transmissivity]
+        parameters:
+          canopy_height_m: 4.0
+          trunk_height_m: 2.0
+          crown_radius_px: 1
+          transmissivity: 0.18
+          cost: 5.0
+        planning_notes: Suitable for narrow sidewalks and street corners.
+      medium_deciduous_tree:
+        support: direct_solweig
+        modifies: [landcover, cdsm_tree_canopy, tdsm_trunk_zone, svf, vegetation_transmissivity]
+        parameters:
+          canopy_height_m: 8.0
+          trunk_height_m: 3.0
+          crown_radius_px: 1
+          transmissivity: 0.12
+          cost: 8.0
+        planning_notes: Current add_tree action is closest to this type.
+      large_deciduous_tree:
+        support: direct_solweig
+        modifies: [landcover, cdsm_tree_canopy, tdsm_trunk_zone, svf, vegetation_transmissivity]
+        parameters:
+          canopy_height_m: 12.0
+          trunk_height_m: 4.0
+          crown_radius_px: 2
+          transmissivity: 0.08
+          cost: 14.0
+        planning_notes: Strong cooling but should be constrained by sidewalk width and underground utilities.
+      evergreen_tree:
+        support: direct_solweig
+        modifies: [landcover, cdsm_tree_canopy, tdsm_trunk_zone, svf, vegetation_transmissivity]
+        parameters:
+          canopy_height_m: 9.0
+          trunk_height_m: 2.5
+          crown_radius_px: 1
+          transmissivity: 0.06
+          cost: 10.0
+        planning_notes: Useful for year-round shade, but may have visibility and maintenance tradeoffs.
+      shrub_or_hedge:
+        support: parameterized_proxy
+        modifies: [landcover, cdsm_tree_canopy, svf]
+        parameters:
+          canopy_height_m: 1.2
+          crown_radius_px: 1
+          transmissivity: 0.35
+          cost: 3.0
+        planning_notes: Lower Tmrt effect than trees, useful as edge or pocket-space greening.
+      grass_or_low_green:
+        support: direct_solweig
+        modifies: [landcover, ground_albedo, ground_emissivity]
+        parameters:
+          landcover_class: grass
+          albedo: 0.20
+          emissivity: 0.95
+          cost: 2.0
+        planning_notes: Represents ground-cover change rather than 3D shade.
+
+  shading_structures:
+    description: Built shade interventions that reduce sky exposure and direct radiation.
+    actions:
+      light_canopy_shade:
+        support: parameterized_proxy
+        modifies: [landcover, svf]
+        parameters:
+          svf_target: 0.68
+          footprint_radius_px: 1
+          cost: 8.0
+        planning_notes: Light shade over resting nodes or small sidewalk segments.
+      dense_canopy_shade:
+        support: parameterized_proxy
+        modifies: [landcover, svf]
+        parameters:
+          svf_target: 0.55
+          footprint_radius_px: 1
+          cost: 12.0
+        planning_notes: Stronger shade for plazas, crossings and bus stops.
+      linear_arcade_or_awning:
+        support: parameterized_proxy
+        modifies: [landcover, svf]
+        parameters:
+          svf_target: 0.60
+          linear_width_px: 1
+          cost_per_cell: 6.0
+        planning_notes: Should be optimized with spatial continuity along pedestrian corridors.
+      pergola_with_vines:
+        support: parameterized_proxy
+        modifies: [landcover, svf, vegetation_transmissivity]
+        parameters:
+          svf_target: 0.62
+          transmissivity: 0.15
+          cost: 10.0
+        planning_notes: Hybrid built/vegetation shade; good for public-space design narratives.
+
+  surface_materials:
+    description: Ground-cover and material interventions through land cover, albedo and emissivity.
+    actions:
+      cool_pavement_high_albedo:
+        support: direct_solweig
+        modifies: [landcover, ground_albedo, ground_emissivity]
+        parameters:
+          albedo: 0.35
+          emissivity: 0.92
+          cost: 5.0
+        planning_notes: Current cool_pavement action is closest to this type.
+      permeable_pavement:
+        support: parameterized_proxy
+        modifies: [landcover, ground_albedo, ground_emissivity]
+        parameters:
+          albedo: 0.25
+          emissivity: 0.94
+          cost: 6.0
+        planning_notes: More realistic for sponge-city and pedestrian-space renewal, but hydrology is not modeled by SOLWEIG.
+      grass_paver:
+        support: parameterized_proxy
+        modifies: [landcover, ground_albedo, ground_emissivity]
+        parameters:
+          albedo: 0.22
+          emissivity: 0.95
+          cost: 6.0
+        planning_notes: Useful for parking edges and low-speed shared streets.
+      water_mist_or_water_feature:
+        support: external_or_future
+        modifies: [landcover]
+        parameters:
+          cost: 12.0
+        planning_notes: Radiative effects can be approximated, but evaporative cooling requires external model support.
+
+  building_envelope:
+    description: Roof, facade, glazing and envelope retrofit actions represented by radiative parameters.
+    actions:
+      white_cool_roof_coating:
+        support: direct_solweig
+        modifies: [roof_albedo, roof_emissivity]
+        parameters:
+          roof_albedo: 0.65
+          roof_emissivity: 0.88
+          cost_per_cell: 4.0
+        planning_notes: High-albedo coating for flat roofs; strong roof surface cooling but possible glare should be constrained.
+      reflective_membrane_roof:
+        support: direct_solweig
+        modifies: [roof_albedo, roof_emissivity]
+        parameters:
+          roof_albedo: 0.55
+          roof_emissivity: 0.86
+          cost_per_cell: 5.0
+        planning_notes: More durable cool-roof membrane for commercial or public buildings.
+      green_roof_extensive:
+        support: parameterized_proxy
+        modifies: [roof_albedo, roof_emissivity, roof_vegetation_proxy]
+        parameters:
+          roof_albedo: 0.25
+          roof_emissivity: 0.95
+          vegetation_height_m: 0.25
+          cost_per_cell: 9.0
+        planning_notes: Better for ecological co-benefits; SOLWEIG can approximate radiation, but hydrology/evapotranspiration is simplified.
+      green_roof_intensive:
+        support: parameterized_proxy
+        modifies: [roof_albedo, roof_emissivity, roof_vegetation_proxy]
+        parameters:
+          roof_albedo: 0.22
+          roof_emissivity: 0.96
+          vegetation_height_m: 0.8
+          cost_per_cell: 16.0
+        planning_notes: Higher cost and structural-load requirement; useful for public building retrofit narratives.
+      rooftop_pv_canopy:
+        support: parameterized_proxy
+        modifies: [roof_albedo, roof_emissivity, roof_shading_proxy]
+        parameters:
+          roof_albedo: 0.18
+          roof_emissivity: 0.85
+          shading_fraction: 0.55
+          cost_per_cell: 14.0
+        planning_notes: PV changes radiative exchange and roof shading; energy benefit needs external model.
+      high_albedo_plaster_facade:
+        support: direct_solweig
+        modifies: [wall_albedo, wall_emissivity]
+        parameters:
+          wall_albedo: 0.50
+          wall_emissivity: 0.90
+          cost_per_edge: 5.0
+        planning_notes: Light facade coating; should avoid excessive glare toward pedestrian spaces.
+      light_colored_brick_facade:
+        support: direct_solweig
+        modifies: [wall_albedo, wall_emissivity]
+        parameters:
+          wall_albedo: 0.38
+          wall_emissivity: 0.92
+          cost_per_edge: 7.0
+        planning_notes: More realistic architectural retrofit than pure white coating for historic or mixed urban districts.
+      ceramic_tile_facade:
+        support: direct_solweig
+        modifies: [wall_albedo, wall_emissivity]
+        parameters:
+          wall_albedo: 0.42
+          wall_emissivity: 0.88
+          cost_per_edge: 8.0
+        planning_notes: Useful for East Asian commercial streets; material assumptions should be city-specific.
+      low_emissivity_metal_panel:
+        support: direct_solweig
+        modifies: [wall_albedo, wall_emissivity]
+        parameters:
+          wall_albedo: 0.45
+          wall_emissivity: 0.65
+          cost_per_edge: 10.0
+        planning_notes: May reduce longwave emission but can create glare and pedestrian radiant discomfort; use with penalty constraints.
+      ventilated_facade_panel:
+        support: parameterized_proxy
+        modifies: [wall_albedo, wall_emissivity, facade_heat_storage_proxy]
+        parameters:
+          wall_albedo: 0.35
+          wall_emissivity: 0.88
+          heat_storage_reduction: 0.20
+          cost_per_edge: 12.0
+        planning_notes: Thermal storage effect is simplified in SOLWEIG; better represented as scenario-level material class.
+      living_green_wall:
+        support: parameterized_proxy
+        modifies: [wall_albedo, wall_emissivity, vegetation_proxy]
+        parameters:
+          wall_albedo: 0.25
+          wall_emissivity: 0.95
+          vegetation_coverage: 0.75
+          cost_per_edge: 13.0
+        planning_notes: Good urban-design intervention, but current raster pipeline needs facade-edge mapping and maintenance constraints.
+      climbing_vine_facade:
+        support: parameterized_proxy
+        modifies: [wall_albedo, wall_emissivity, vegetation_proxy]
+        parameters:
+          wall_albedo: 0.28
+          wall_emissivity: 0.95
+          vegetation_coverage: 0.45
+          cost_per_edge: 8.0
+        planning_notes: Lower cost green facade option; slower implementation and seasonal variability should be noted.
+      external_louver_shading:
+        support: parameterized_proxy
+        modifies: [wall_shading_proxy, svf_edge_proxy]
+        parameters:
+          facade_shading_fraction: 0.35
+          cost_per_edge: 9.0
+        planning_notes: Reduces facade solar gain and can shade sidewalk edges; needs facade orientation.
+      balcony_or_colonnade_shading:
+        support: parameterized_proxy
+        modifies: [wall_shading_proxy, svf_edge_proxy]
+        parameters:
+          facade_shading_fraction: 0.50
+          sidewalk_svf_reduction: 0.12
+          cost_per_edge: 11.0
+        planning_notes: Urban-design action linking building edge and pedestrian comfort.
+      low_e_glazing_retrofit:
+        support: external_or_future
+        modifies: [window_solar_transmittance_proxy, facade_heat_gain_proxy]
+        parameters:
+          solar_heat_gain_coefficient: 0.35
+          visible_transmittance: 0.60
+          cost_per_edge: 10.0
+        planning_notes: Important building retrofit action, but pedestrian Tmrt impact needs coupling with building-energy or facade-radiation assumptions.
+      fritted_or_shaded_glazing:
+        support: external_or_future
+        modifies: [window_solar_transmittance_proxy, facade_reflection_proxy]
+        parameters:
+          solar_heat_gain_coefficient: 0.45
+          exterior_reflectance: 0.25
+          cost_per_edge: 9.0
+        planning_notes: Needs glare and reflected-radiation checks before being used as a positive intervention.
+
+  spatial_planning_patterns:
+    description: Higher-level planning patterns built from lower-level actions.
+    actions:
+      shaded_pedestrian_corridor:
+        support: parameterized_proxy
+        composed_of: [medium_deciduous_tree, linear_arcade_or_awning, cool_pavement_high_albedo]
+        planning_objective: Maximize continuous shade along hot pedestrian paths.
+      cool_public_node:
+        support: parameterized_proxy
+        composed_of: [large_deciduous_tree, dense_canopy_shade, permeable_pavement]
+        planning_objective: Create clustered cooling around plazas, transit stops and street corners.
+      pocket_green_space:
+        support: parameterized_proxy
+        composed_of: [small_deciduous_tree, shrub_or_hedge, grass_or_low_green]
+        planning_objective: Convert small residual pavement patches into local cooling nodes.
+      building_edge_retrofit:
+        support: parameterized_proxy
+        composed_of: [cool_facade, green_wall, linear_arcade_or_awning]
+        planning_objective: Improve thermal comfort along high-exposure building edges.
+
+evaluation_extensions:
+  thermal:
+    - mean_delta_tmrt
+    - weak_hour_delta_tmrt
+    - p90_delta_tmrt
+    - worsened_cells
+  implementability:
+    - action_diversity
+    - max_single_action_share
+    - sidewalk_or_open_space_validity
+    - maintenance_cost
+  spatial_integrity:
+    - cluster_score
+    - corridor_continuity
+    - adjacency_synergy
+    - distance_to_hotspot
